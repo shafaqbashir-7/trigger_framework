@@ -7,7 +7,7 @@ public class TriggerManager {
   }
 
   private Boolean validateRun() {
-    if(!this.isTriggerExecuting || this.context == null) {
+    if (!this.isTriggerExecuting || this.context == null) {
       throw new TriggerHandlerException('Trigger handler called outside of Trigger execution');
     }
     return true;
@@ -57,78 +57,56 @@ public class TriggerManager {
     }
 }
 
-  public  void afterUpdate() {
+  public void afterUpdate() {
     List<sObject> sObjectList                     = Trigger.new;
     String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
     List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Update__c = true AND Object_Name__c = : objectType];
-    for (Trigger_Definition__c tDefinition : triggerDefinition) {
-      Type t = Type.forName(tDefinition.Class_Name__c);
-      Object o = t.newInstance();
-    }
+    classObject(triggerDefinition);
   }
 
-  public  void beforeUpdate() {
+  public void beforeUpdate() {
     List<sObject> sObjectList                     = Trigger.new;
     String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
     List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('before') AND Update__c = true AND Object_Name__c = : objectType];
-    if (triggerDefinition.size() > 0) {
-      for (Trigger_Definition__c tDefinition : triggerDefinition) {
-        Type t = Type.forName(tDefinition.Class_Name__c);
-        Object o = t.newInstance();
-      }
-    }
+    classObject(triggerDefinition);
   }
 
-  public  void afterInsert() {
+  public void afterInsert() {
     List<sObject> sObjectList                     = Trigger.new;
     String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
     List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Insert__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Insert__c = true AND Object_Name__c = : objectType];
-    if (triggerDefinition.size() > 0) {
-      for (Trigger_Definition__c tDefinition : triggerDefinition) {
-        Type t = Type.forName(tDefinition.Class_Name__c);
-        Object o = t.newInstance();
-      }
-    }
+    classObject(triggerDefinition);
   }
 
-  public  void beforeInsert() {
+  public void beforeInsert() {
     List<sObject> sObjectList                     = Trigger.new;
     String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
     List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Insert__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('before') AND Insert__c = true AND Object_Name__c = : objectType];
-    if (triggerDefinition.size() > 0) {
-      for (Trigger_Definition__c tDefinition : triggerDefinition) {
-        Type t = Type.forName(tDefinition.Class_Name__c);
-        Object o = t.newInstance();
-      }
-    }
+    classObject(triggerDefinition);
   }
 
   public void afterDelete() {
     List<sObject> sObjectList                     = Trigger.old;
     String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
     List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Delete__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Delete__c = true AND Object_Name__c = : objectType];
-    if (triggerDefinition.size() > 0) {
-      for (Trigger_Definition__c tDefinition : triggerDefinition) {
-        Type t = Type.forName(tDefinition.Class_Name__c);
-        Object o = t.newInstance();
-      }
-    }
+    classObject(triggerDefinition);
   }
+
   public void afterUndelete() {
     List<sObject> sObjectList                     = Trigger.new;
     String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
     List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Delete__c = true AND Object_Name__c = : objectType];
-    if (triggerDefinition.size() > 0) {
-      for (Trigger_Definition__c tDefinition : triggerDefinition) {
-        Type t = Type.forName(tDefinition.Class_Name__c);
-        Object o = t.newInstance();
-      }
-    }
+    classObject(triggerDefinition);
   }
+
   public void beforeDelete() {
     List<sObject> sObjectList                     = Trigger.old;
     String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
     List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Delete__c = true AND Object_Name__c = : objectType];
+    classObject(triggerDefinition);
+  }
+
+  public void classObject(List<Trigger_Definition__c> triggerDefinition) {
     if (triggerDefinition.size() > 0) {
       for (Trigger_Definition__c tDefinition : triggerDefinition) {
         Type t = Type.forName(tDefinition.Class_Name__c);
@@ -136,7 +114,6 @@ public class TriggerManager {
       }
     }
   }
-
   private enum TriggerContext {
     BEFORE_INSERT, BEFORE_UPDATE, BEFORE_DELETE,
     AFTER_INSERT, AFTER_UPDATE, AFTER_DELETE,
