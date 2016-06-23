@@ -1,9 +1,9 @@
 @isTest
 public class AccountsTest {
   static testMethod void testInsert() {
-    Trigger_Definition__c beforeDefinition = new Trigger_Definition__c(Active__c = true, Class_Name__c = 'SetAccountFlag', Object_Name__c = 'Account', Context__c = 'before', Insert__c = true, Update__c = true, Delete__c = true, Undelete__c = true);
+    Trigger_Definition__c beforeDefinition = new Trigger_Definition__c(Active__c = true, Class_Name__c = 'AccountContact', Object_Name__c = 'Account', Context__c = 'before', Insert__c = true, Update__c = true, Delete__c = true, Undelete__c = true);
     insert beforeDefinition;
-    Trigger_Definition__c afterDefinition = new Trigger_Definition__c(Active__c = true, Class_Name__c = 'SetAccountFlag', Object_Name__c = 'Account', Context__c = 'after', Insert__c = true, Update__c = true, Delete__c = true, Undelete__c = true);
+    Trigger_Definition__c afterDefinition = new Trigger_Definition__c(Active__c = true, Class_Name__c = 'SetAccountContact', Object_Name__c = 'Account', Context__c = 'after', Insert__c = true, Update__c = true, Delete__c = true, Undelete__c = true);
     insert afterDefinition;
 
     Account acc = new Account(Name = 'Test Trigger');
