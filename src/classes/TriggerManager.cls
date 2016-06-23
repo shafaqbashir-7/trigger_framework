@@ -108,11 +108,15 @@ public class TriggerManager {
 
   public void classObject(List<Trigger_Definition__c> triggerDefinition) {
     if (triggerDefinition.size() > 0) {
-      for (Trigger_Definition__c tDefinition : triggerDefinition) {
-        Type t = Type.forName(tDefinition.Class_Name__c);
-        Object o = t.newInstance();
-      }
-    }
+     for (Trigger_Definition__c tDefinition : triggerDefinition) {
+         try {
+           Type t = Type.forName(tDefinition.Class_Name__c);
+           t.newInstance();
+         } catch(Exception e) {
+             System.debug('Class Name was wrong');
+         }
+       }
+     }
   }
   private enum TriggerContext {
     BEFORE_INSERT, BEFORE_UPDATE, BEFORE_DELETE,
