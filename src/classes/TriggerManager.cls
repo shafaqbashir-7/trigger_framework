@@ -1,8 +1,10 @@
 public class TriggerManager {
   private TriggerContext context;
   private Boolean isTriggerExecuting;
+  private String query;
 
   public TriggerManager() {
+    query = '';
     this.setTriggerContext();
   }
 
@@ -15,21 +17,35 @@ public class TriggerManager {
   public void run() {
     if (!validateRun())
       return;
-    if (this.context == TriggerContext.BEFORE_INSERT) {
-      this.beforeInsert();
-    } else if (this.context == TriggerContext.BEFORE_UPDATE) {
-      this.beforeUpdate();
-    } else if (this.context == TriggerContext.BEFORE_DELETE) {
-      this.beforeDelete();
-    } else if (this.context == TriggerContext.AFTER_INSERT) {
-      this.afterInsert();
-    } else if (this.context == TriggerContext.AFTER_UPDATE) {
-      this.afterUpdate();
-    } else if (this.context == TriggerContext.AFTER_DELETE) {
-      this.afterDelete();
-    } else if (this.context == TriggerContext.AFTER_UNDELETE) {
-      this.afterUndelete();
-    }
+      if (this.context == TriggerContext.BEFORE_INSERT) {
+        List<sObject> sObjectList = Trigger.new;
+        query                     = 'SELECT Id, Active__c, Class_Name__c, Context__c, Insert__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES(\'before\') AND Insert__c = true AND Object_Name__c = \''+ sObjectList[0].getSObjectType().getDescribe().getName() +'\' ';
+        classObject(sObjectList, query);
+      } else if (this.context == TriggerContext.BEFORE_UPDATE) {
+        List<sObject> sObjectList = Trigger.new;
+        query                     = 'SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES(\'before\') AND Update__c = true AND Object_Name__c = \''+ sObjectList[0].getSObjectType().getDescribe().getName() +'\' ';
+        classObject(sObjectList, query);
+      } else if (this.context == TriggerContext.BEFORE_DELETE) {
+        List<sObject> sObjectList = Trigger.old;
+        query                     = 'SELECT Id, Active__c, Class_Name__c, Context__c, Delete__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES(\'before\') AND Delete__c = true AND Object_Name__c = \''+ sObjectList[0].getSObjectType().getDescribe().getName() +'\' ';
+        classObject(sObjectList, query);
+      } else if (this.context == TriggerContext.AFTER_INSERT) {
+        List<sObject> sObjectList = Trigger.new;
+        query                     = 'SELECT Id, Active__c, Class_Name__c, Context__c, Insert__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES(\'after\') AND Insert__c = true AND Object_Name__c = \''+ sObjectList[0].getSObjectType().getDescribe().getName() +'\' ';
+        classObject(sObjectList, query);
+      } else if (this.context == TriggerContext.AFTER_UPDATE) {
+        List<sObject> sObjectList = Trigger.new;
+        query                     = 'SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES(\'after\') AND Update__c = true AND Object_Name__c = \''+ sObjectList[0].getSObjectType().getDescribe().getName() +'\' ';
+        classObject(sObjectList, query);
+      } else if (this.context == TriggerContext.AFTER_DELETE) {
+          List<sObject> sObjectList = Trigger.old;
+          query                     = 'SELECT Id, Active__c, Class_Name__c, Context__c, Delete__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES(\'after\') AND Delete__c = true AND Object_Name__c = \''+ sObjectList[0].getSObjectType().getDescribe().getName() +'\' ';
+          classObject(sObjectList, query);
+      } else if (this.context == TriggerContext.AFTER_UNDELETE) {
+        List<sObject> sObjectList = Trigger.new;
+        query                     = 'SELECT Id, Active__c, Class_Name__c, Context__c, Undelete__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES(\'after\') AND Undelete__c = true AND Object_Name__c = \''+ sObjectList[0].getSObjectType().getDescribe().getName() +'\' ';
+        classObject(sObjectList, query);
+      }
   }
 
   private void setTriggerContext() {
@@ -56,64 +72,16 @@ public class TriggerManager {
       this.context = TriggerContext.AFTER_UNDELETE;
     }
 }
-
-  public void afterUpdate() {
-    List<sObject> sObjectList                     = Trigger.new;
+  public void classObject(List<sObject> sObjectList, String query) {
     String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
-    List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Update__c = true AND Object_Name__c = : objectType];
-    classObject(triggerDefinition);
-  }
-
-  public void beforeUpdate() {
-    List<sObject> sObjectList                     = Trigger.new;
-    String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
-    List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('before') AND Update__c = true AND Object_Name__c = : objectType];
-    classObject(triggerDefinition);
-  }
-
-  public void afterInsert() {
-    List<sObject> sObjectList                     = Trigger.new;
-    String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
-    List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Insert__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Insert__c = true AND Object_Name__c = : objectType];
-    classObject(triggerDefinition);
-  }
-
-  public void beforeInsert() {
-    List<sObject> sObjectList                     = Trigger.new;
-    String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
-    List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Insert__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('before') AND Insert__c = true AND Object_Name__c = : objectType];
-    classObject(triggerDefinition);
-  }
-
-  public void afterDelete() {
-    List<sObject> sObjectList                     = Trigger.old;
-    String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
-    List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Delete__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Delete__c = true AND Object_Name__c = : objectType];
-    classObject(triggerDefinition);
-  }
-
-  public void afterUndelete() {
-    List<sObject> sObjectList                     = Trigger.new;
-    String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
-    List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Delete__c = true AND Object_Name__c = : objectType];
-    classObject(triggerDefinition);
-  }
-
-  public void beforeDelete() {
-    List<sObject> sObjectList                     = Trigger.old;
-    String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
-    List<Trigger_Definition__c> triggerDefinition = [SELECT Id, Active__c, Class_Name__c, Context__c, Update__c, Object_Name__c FROM Trigger_Definition__c WHERE Active__c = true AND Context__c INCLUDES('after') AND Delete__c = true AND Object_Name__c = : objectType];
-    classObject(triggerDefinition);
-  }
-
-  public void classObject(List<Trigger_Definition__c> triggerDefinition) {
+    List<Trigger_Definition__c> triggerDefinition = Database.query(query);
     if (triggerDefinition.size() > 0) {
      for (Trigger_Definition__c tDefinition : triggerDefinition) {
          try {
            Type t = Type.forName(tDefinition.Class_Name__c);
            t.newInstance();
          } catch(Exception e) {
-             System.debug('Class Name was wrong');
+             System.debug('Class Name was Wrong');
          }
        }
      }
