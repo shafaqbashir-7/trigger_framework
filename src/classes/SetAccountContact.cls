@@ -8,7 +8,7 @@ public class SetAccountContact {
   public void afterInsert(List<Account> accountList) {
     List<Contact> contactList = new List<Contact>();
     for (Account acc : accountList) {
-      Contact con = new Contact(FirstName = 'Test', LastName = 'Contact', Account = acc);
+      Contact con = new Contact(FirstName = 'Test', LastName = 'Contact', AccountId = acc.Id);
       contactList.add(con);
     }
     insert contactList;
