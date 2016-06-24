@@ -73,7 +73,6 @@ public class TriggerManager {
     }
 }
   public void classObject(List<sObject> sObjectList, String query) {
-    String objectType                             = sObjectList[0].getSObjectType().getDescribe().getName();
     List<Trigger_Definition__c> triggerDefinition = Database.query(query);
     if (triggerDefinition.size() > 0) {
      for (Trigger_Definition__c tDefinition : triggerDefinition) {
